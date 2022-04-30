@@ -56,9 +56,9 @@ function optimizeIcons(opts) {
   /**
    * Step 3: optimize the SVGs and generate a sprite sheet
    */
-  let optimized = optimizeSVGs(treeForIcons);
+  let optimized = []; // optimizeSVGs(treeForIcons);
 
-  return new MergeTrees([treeForIcons, optimized]);
+  return new MergeTrees([treeForIcons, optimized].flat());
 }
 
 module.exports = { optimizeIcons };
