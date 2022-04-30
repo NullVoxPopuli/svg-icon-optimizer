@@ -35,13 +35,13 @@ function parseFile(filePath, options) {
 
   switch (ext) {
     case '.hbs':
-      return parseTemplate(content, options);
+      return extractFromTemplate(content, options);
     case '.js':
     case '.ts':
-      return parseHBSLiteral(content, options);
+      return extractFromHBSLiteral(content, options);
     case '.gjs':
     case '.gts':
-      return parseTemplateTags(content, options);
+      return extractFromTemplateTags(content, options);
     default:
       throw new Error(`Unexpected file type: ${ext}, ${filePath}`);
   }
@@ -52,7 +52,7 @@ function parseFile(filePath, options) {
  * @param {string} content
  * @param {import('./types').ResolvedOptions} options
  */
-function parseTemplate(content, options) {
+function extractFromTemplate(content, options) {
   let result = [];
 
   transform({
@@ -96,7 +96,7 @@ function parseTemplate(content, options) {
  * @param {string} content
  * @param {import('./types').ResolvedOptions} options
  */
-function parseHBSLiteral(content, options) {
+function extractFromHBSLiteral(content, options) {
   let result = [];
 
   let parsed = parseTemplate(content);
@@ -111,7 +111,7 @@ function parseHBSLiteral(content, options) {
  * @param {string} content
  * @param {import('./types').ResolvedOptions} options
  */
-function parseTemplateTags(content, options) {
+function extractFromTemplateTags(content, options) {
   let result = [];
 
   let parsed = parseTemplate(content);
