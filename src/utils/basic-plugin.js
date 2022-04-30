@@ -13,13 +13,9 @@ module.exports = class BasePlugin extends Plugin {
 
   build() {
     this.inputPaths.forEach((inputPath) => {
-      walkTree(
-        inputPath,
-        { inputPath, fullPath: inputPath },
-        (filePath, meta) => {
-          this.processFile(filePath, meta);
-        }
-      );
+      walkTree(inputPath, { inputPath, fullPath: inputPath }, (filePath, meta) => {
+        this.processFile(filePath, meta);
+      });
     });
     this.emit();
   }
