@@ -1,9 +1,10 @@
+// @ts-check
 'use strict';
 
-const path = require('path');
-const Funnel = require('broccoli-funnel');
+const funnel = require('broccoli-funnel');
 const { MergeTrees } = require('broccoli-merge-trees');
-const globby = require('globby');
+
+const { discoverUsages } = require('./usage-discovery');
 
 const DEFAULTS = {
   appPaths: ['app', 'addon', 'src'],
@@ -32,63 +33,25 @@ const DEFAULTS = {
  * </svg>
  * `
  *
- * @typedef Options
- * @property {string[]} svgPaths
- * list of absolute paths to find svgs that could be used in your app.
- * example:
- *
- * ```js
- * [
- *   path.join(
- *     path.dirname(require.resolve('@fortawesome/fontawesome-free/package.json')),
- *     'svgs'
- *   )
- * ]
- * ```
- *
- * @property{string[]} [appPaths = ['app', 'addon', 'src']]
- * list of relative paths to search for svg path occurrences.
- * used for finding which svgs to copy to the build output
- *
- * @property {string} [componentName = 'Icon']
- * the name of the component to search for the `iconNameName`, which is then
- * used for finding which svgs to copy to the build output
- *
- * @property {string} [iconArgName = '@name']
- * the name of the argument that should match an svg found in the `svgPaths`
- *
- * @property {string} [outputPath = '/assets/svg/']
- * where to put the detected SVGs (and spritemap) in the build output
- *
- * @param {Options} options
+ * @param {import('./types').Options} opts
  */
-module.exports = function optimizeIcons(_options = {}) {
-  let options = { ...DEFAULTS, ..._options };
-  let iconNames = [];
+module.exports = function optimizeIcons(opts) {
+  let options = { ...DEFAULTS, ...opts };
+  // TODO: the discovery phase needs to be a broccoli tree so that we get
+  //       file watching and all that from the input files
 
-  /**
-   * Step 1: discover what icons are being requested from the `appPaths`
-   */
-  let searchPaths = globby.sync(options.appPaths, {
-    expandDirectories: {
-      files: ['**/*'],
-      extensions: ['hbs', 'gts', 'gjs', 'js', 'ts'],
-    },
-  });
-
-  console.log(searchPaths);
+  let iconNames = discoverUsages(options);
 
   /**
    * Step 2: find the requested icons from `svgPaths` and copy them to
    *         `outputPath`
    */
   let treeForIcons = new MergeTrees(
-    options.svgPaths.map(
-      (svgPath) =>
-        new Funnel(svgPath, {
-          destDir: options.outputPath,
-          include: iconNames,
-        })
+    options.svgPaths.map((svgPath) =>
+      funnel(svgPath, {
+        destDir: options.outputPath,
+        include: iconNames,
+      })
     )
   );
 
