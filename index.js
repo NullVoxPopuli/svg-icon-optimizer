@@ -1,26 +1,32 @@
 'use strict';
 
+const path = require('path');
 const Funnel = require('broccoli-funnel');
 const merge = require('broccoli-merge-trees');
+const BroccoliDebug = require('broccoli-debug');
 const SVGOptimizer = require('./lib/svgo-optimizer');
-const path = require('path');
 const SpriteConfigGenerator = require('./lib/sprite-config-generator');
 const SpriteAssembler = require('./lib/sprite-assembler');
 const dasherize = require('./lib/utils/dasherize');
-const BroccoliDebug = require('broccoli-debug');
 
 function templatePrecompiler(env) {
   const b = env.syntax.builders;
+
   return {
     name: 'svg-component-rewrite',
     visitor: {
       ElementNode(node) {
         if (node.tag.startsWith('Icon::')) {
           const parts = node.tag.split('::');
+
           parts.shift();
+
           const fullName = parts.map(dasherize).join('/');
+
           node.tag = 'SVGIcon';
+
           const attr = b.attr('@name', b.text(fullName));
+
           node.attributes.push(attr);
         }
       },
@@ -36,23 +42,21 @@ module.exports = {
   },
 
   pathForMainFilesRoot() {
-    const projectPath =
-      this.parent.root || require.resolve(this.parent.options.name);
+    const projectPath = this.parent.root || require.resolve(this.parent.options.name);
 
     return path.join(projectPath, this.parentIsAddon() ? 'addon' : 'app');
   },
 
   preprocessTree(type, tree) {
-    const parentName =
-      typeof this.parent.name === 'string'
-        ? this.parent.name
-        : this.parent.name();
+    const parentName = typeof this.parent.name === 'string' ? this.parent.name : this.parent.name();
+
     if (type === 'js') {
       // prevent the glimmer precompile from including js files for these
       return new Funnel(tree, {
         exclude: [`${parentName}/components/icon/**/*.js`],
       });
     }
+
     if (type === 'template') {
       return new BroccoliDebug(
         new Funnel(tree, {
@@ -61,19 +65,17 @@ module.exports = {
         'html-next:hbs-sans-svg'
       );
     }
+
     return tree;
   },
 
   treeForPublic(tree) {
-    const treeForIcons = new Funnel(
-      path.join(this.pathForMainFilesRoot(), './components/icon'),
-      {
-        destDir: 'assets/component-icons',
-        getDestinationPath(relativePath) {
-          return relativePath.replace('.hbs', '.svg');
-        },
-      }
-    );
+    const treeForIcons = new Funnel(path.join(this.pathForMainFilesRoot(), './components/icon'), {
+      destDir: 'assets/component-icons',
+      getDestinationPath(relativePath) {
+        return relativePath.replace('.hbs', '.svg');
+      },
+    });
     const treeForTemplates = new Funnel(this.pathForMainFilesRoot(), {
       include: ['**/*.hbs'],
       exclude: ['components/icon/**/*.hbs'],
@@ -82,7 +84,9 @@ module.exports = {
       },
     });
     const config = this.getConfig();
+
     console.log({ config });
+
     const configTree = new BroccoliDebug(
       new SpriteConfigGenerator(treeForTemplates, config),
       'html-next:sprite-config'
@@ -96,9 +100,7 @@ module.exports = {
           comment: {
             enter: (node, parentNode) => {
               if (node.value.charAt(0) === '!') {
-                parentNode.children = parentNode.children.filter(
-                  (child) => child !== node
-                );
+                parentNode.children = parentNode.children.filter((child) => child !== node);
               }
             },
           },
@@ -114,6 +116,7 @@ module.exports = {
       },
     });
     const spriteTree = new SpriteAssembler([configTree, compiled]);
+
     return tree
       ? merge([tree, spriteTree, compiled], { overwrite: true })
       : merge([spriteTree, compiled], { overwrite: true });
@@ -122,11 +125,13 @@ module.exports = {
   getConfig() {
     if (this.parentIsAddon()) {
       let options = this.parent.options || {};
+
       return options.svgIconOptimizer || {};
     } else {
       const app = this._findHost();
 
       let options = (app.options = app.options || {});
+
       options.svgIconOptimizer = options.svgIconOptimizer || {};
 
       return options.svgIconOptimizer;
