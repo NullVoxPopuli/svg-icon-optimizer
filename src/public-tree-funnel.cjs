@@ -35,7 +35,7 @@ const DEFAULTS = {
  *
  * @param {import('./types').Options} opts
  */
-module.exports = function optimizeIcons(opts) {
+function optimizeIcons(opts) {
   let options = { ...DEFAULTS, ...opts };
   // TODO: the discovery phase needs to be a broccoli tree so that we get
   //       file watching and all that from the input files
@@ -61,9 +61,6 @@ module.exports = function optimizeIcons(opts) {
   // TODO
 
   return new MergeTrees([treeForIcons]);
-};
+}
 
-/**
- * Support named imports / requires as well as default
- */
-module.exports.optimizeIcons = module.exports;
+module.exports = { optimizeIcons };
