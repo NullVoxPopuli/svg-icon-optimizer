@@ -23,7 +23,7 @@ function discoverUsages(options) {
     result.push(...parseFile(filePath, options));
   }
 
-  return result;
+  return result.flat();
 }
 
 module.exports = { discoverUsages };

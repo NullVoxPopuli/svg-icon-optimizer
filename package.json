@@ -2,9 +2,7 @@
   "name": "@html-next/svg-icon-optimizer",
   "version": "0.0.0",
   "description": "SVG Icon Performance Optimization",
-  "keywords": [
-    "ember-addon"
-  ],
+  "keywords": [],
   "repository": {
     "git": "git@github.com:html-next/svg-icon-optimizer.git"
   },

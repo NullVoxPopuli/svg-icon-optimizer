@@ -1,10 +1,11 @@
 // @ts-check
 'use strict';
 
-const funnel = require('broccoli-funnel');
 const { MergeTrees } = require('broccoli-merge-trees');
 
+const { verifyOptions } = require('./verify-options');
 const { discoverUsages } = require('./usage-discovery');
+const { copyByName } = require('./copy-by-name');
 
 const DEFAULTS = {
   appPaths: ['app', 'addon', 'src'],
@@ -37,6 +38,9 @@ const DEFAULTS = {
  */
 function optimizeIcons(opts) {
   let options = { ...DEFAULTS, ...opts };
+
+  verifyOptions(options);
+
   // TODO: the discovery phase needs to be a broccoli tree so that we get
   //       file watching and all that from the input files
 
@@ -46,14 +50,7 @@ function optimizeIcons(opts) {
    * Step 2: find the requested icons from `svgPaths` and copy them to
    *         `outputPath`
    */
-  let treeForIcons = new MergeTrees(
-    options.svgPaths.map((svgPath) =>
-      funnel(svgPath, {
-        destDir: options.outputPath,
-        include: iconNames,
-      })
-    )
-  );
+  let treeForIcons = copyByName(options, iconNames);
 
   /**
    * Step 3: optimize the SVGs and generate a sprite sheet
