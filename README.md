@@ -42,6 +42,8 @@ Compatibility
 * Ember CLI v3.24 or above
 * Node.js v12 or above
 
+Supports extracting templates from js, ts, gjs, gts, and hbs files
+
 
 Installation
 ------------------------------------------------------------------------------
