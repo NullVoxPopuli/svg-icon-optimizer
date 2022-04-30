@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const globby = require('globby');
 const { transform } = require('ember-template-recast');
-const { parseTemplate } = require('ember-template-imports');
+const { extractTemplates } = require('./-parse-templates');
 
 /**
  * @param {import('./types').ResolvedOptions} options
@@ -99,9 +99,9 @@ function extractFromTemplate(content, options) {
 function extractFromHBSLiteral(content, options) {
   let result = [];
 
-  let parsed = parseTemplate(content);
+  let templates = extractTemplates(content);
 
-  console.log(parsed)
+  if (templates.length === 0) return result;
 
   return result;
 }
@@ -114,9 +114,9 @@ function extractFromHBSLiteral(content, options) {
 function extractFromTemplateTags(content, options) {
   let result = [];
 
-  let parsed = parseTemplate(content);
+  let templates = extractTemplates(content);
 
-  console.log(parsed)
+  if (templates.length === 0) return result;
 
   return result;
 }
