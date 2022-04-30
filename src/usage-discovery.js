@@ -103,6 +103,8 @@ function extractFromHBSLiteral(content, options) {
 
   if (templates.length === 0) return result;
 
+  result.push(...templates.map((template) => extractFromTemplate(template, options)));
+
   return result;
 }
 
@@ -117,6 +119,8 @@ function extractFromTemplateTags(content, options) {
   let templates = extractTemplates(content);
 
   if (templates.length === 0) return result;
+
+  result.push(...templates.map((template) => extractFromTemplate(template, options)));
 
   return result;
 }

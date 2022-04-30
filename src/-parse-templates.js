@@ -33,7 +33,7 @@ function extractTemplates(code) {
   let root = j(parsed);
   let result = [];
 
-  j(root)
+  root
     .find(j.CallExpression, { callee: { name: util.TEMPLATE_TAG_PLACEHOLDER } })
     .forEach((path) => {
       let template = path.node?.arguments?.[0]?.quasis?.[0]?.value?.raw;
