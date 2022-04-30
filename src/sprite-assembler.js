@@ -2,7 +2,6 @@ const path = require('path');
 const fs = require('fs');
 const cheerio = require('cheerio');
 const Plugin = require('./utils/basic-plugin');
-const formatAttrs = require('./utils/format-attrs');
 const consoleUI = require('./utils/console-ui');
 
 function processSVG(svgContent, symbolName, filePath) {

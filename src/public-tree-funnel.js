@@ -6,6 +6,7 @@ const { MergeTrees } = require('broccoli-merge-trees');
 const { verifyOptions } = require('./verify-options');
 const { discoverUsages } = require('./usage-discovery');
 const { copyByName } = require('./copy-by-name');
+const { optimizeSVGs } = require('./optimize');
 
 const DEFAULTS = {
   appPaths: ['app', 'addon', 'src'],
@@ -55,9 +56,9 @@ function optimizeIcons(opts) {
   /**
    * Step 3: optimize the SVGs and generate a sprite sheet
    */
-  // TODO
+  let optimized = optimizeSVGs(treeForIcons);
 
-  return new MergeTrees([treeForIcons]);
+  return new MergeTrees([treeForIcons, optimized]);
 }
 
 module.exports = { optimizeIcons };
